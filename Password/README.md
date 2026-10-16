@@ -30,3 +30,6 @@ El módulo contiene scripts y recursos diseñados para evaluar la robustez de cr
 ## 🚀 Uso y Requisitos
 
 Para conocer los requisitos específicos del lenguaje de ejecución y los parámetros de los scripts, revisa directamente los comentarios en la cabecera de cada archivo antes de su ejecución.
+
+# Puedes descargar este módulo de forma independiente en un archivo comprimido:
+* **[Descargar esta carpeta en ZIP](https://downgit.github.io/#/home?url=https://github.com/Dioni001/Helper/tree/main/Password)** *(vía DownGit)*

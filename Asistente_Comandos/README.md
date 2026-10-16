@@ -1,4 +1,4 @@
-# Buscador de Comandos
+# Asistente de Comandos
 
 Página web para encontrar comandos de terminal buscando lo que querés hacer, en español, en vez de tener que acordarte la sintaxis exacta. Pensada para usarse al lado de la terminal (CMD, PowerShell, Git Bash) y copiar el comando con un clic.
 
@@ -57,3 +57,6 @@ Si se abre con un navegador que no puede guardar en archivos, los comandos queda
 ## Requisitos
 
 Ninguno. Es un solo archivo HTML que corre en el navegador.
+
+# Puedes descargar este módulo de forma independiente en un archivo comprimido:
+* **[Descargar esta carpeta en ZIP](https://downgit.github.io/#/home?url=https://github.com/Dioni001/Helper/tree/main/Asistente_Comandos)** *(vía DownGit)*

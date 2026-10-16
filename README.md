@@ -13,7 +13,8 @@ El repositorio se divide en diferentes directorios según el propósito de cada 
 | Módulo | Estado | Descripción técnica | Enlace a Documentación |
 | :--- | :--- | :--- | :--- |
 | **`Bocetos`** | Experimental / Sin refinar | Generador de bocetos y estructuras proporcionales basado en parámetros y medidas corporales. | [Ver README](./Bocetos/README.md) |
-| **`Password`** | Experimental / Sin refinar | Utilidades de análisis de claves que incluyen un diccionario masivo (+10k palabras) orientado a auditorías de seguridad, junto a simuladores de fuerza bruta y ataques por diccionario. | [Ver README](./Password/README.md) |
+| **`Password`** | Experimental / Sin refinar | Utilidades de análisis de credenciales y diccionarios orientados a auditorías de seguridad. | [Ver README](./Password/README.md) |
+| **`Asistente_Comandos`** | Funcional / Local | CLI y recetario interactivo web de comandos de consola con búsqueda multi-descripción y soporte para Windows y Git. | [Ver README](./Asistente_Comandos/README.md) |
 | **`registro_de_ventas`** | Experimental / Sin refinar | Herramienta orientada al registro, control y procesamiento de transacciones comerciales. | [Ver README](./registro_de_ventas/README.md) |
 
 ---

@@ -33,3 +33,6 @@ entrepierna=85
 
 - Todo el cálculo ocurre en el navegador; no se envía ni guarda información en ningún servidor.
 - El dibujo es una aproximación geométrica (óvalos y polígonos a partir de perímetros), no una silueta anatómica realista.
+
+# Puedes descargar este módulo de forma independiente en un archivo comprimido:
+* **[Descargar esta carpeta en ZIP](https://downgit.github.io/#/home?url=https://github.com/Dioni001/Helper/tree/main/Bocetos)** *(vía DownGit)*

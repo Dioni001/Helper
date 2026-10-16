@@ -29,3 +29,6 @@ Si se abre con un navegador que no puede guardar en archivos (como Firefox), las
 ## Requisitos
 
 Ninguno. Es un solo archivo HTML que corre en el navegador.
+
+# Puedes descargar este módulo de forma independiente en un archivo comprimido:
+* **[Descargar esta carpeta en ZIP](https://downgit.github.io/#/home?url=https://github.com/Dioni001/Helper/tree/main/registro_de_ventas)** *(vía DownGit)*
