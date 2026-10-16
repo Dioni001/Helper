@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de ventas</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --ink: #14181f;
+    --muted: #6b7280;
+    --line: #e3e6ea;
+    --denim: #274b73;
+    --denim-soft: #e8eef5;
+    --yes: #1f6f4a;
+    --yes-soft: #e6f3ec;
+    --no: #9a3b2e;
+    --no-soft: #f8ebe8;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 56px; }
+
+  header.top {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    align-items: flex-end; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  h1 { margin: 0; font-size: 26px; font-weight: 650; letter-spacing: -0.02em; }
+  .sub { margin: 2px 0 0; color: var(--muted); }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: default; }
+  :focus-visible { outline: 2px solid var(--denim); outline-offset: 2px; }
+
+  .btn {
+    border: 1px solid var(--line); background: var(--surface);
+    padding: 8px 14px; border-radius: 8px;
+  }
+  .btn:hover { border-color: #c9ced6; }
+  .btn.small { padding: 6px 12px; font-size: 14px; }
+  .btn.primary {
+    background: var(--denim); border-color: var(--denim); color: #fff;
+    font-weight: 600; padding: 10px 16px;
+  }
+  .btn.primary.small { padding: 6px 12px; }
+  .btn.primary:hover { background: #1f3d5e; }
+
+  .notice {
+    background: var(--no-soft); color: var(--no);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+  }
+
+  .filebar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .filebar.attn { background: var(--denim-soft); border-color: #c8d6e6; }
+  .filebar .grow { flex: 1 1 260px; }
+  .filebar .muted { color: var(--muted); }
+  .filebar .filemsg { flex-basis: 100%; color: var(--no); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .dot.ok { background: var(--yes); }
+  .dot.warn { background: #c27a1c; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
+  .stat .label { color: var(--muted); font-size: 13px; }
+  .stat .value { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  .form-card { padding: 20px; position: sticky; top: 20px; }
+  .form-card h2 { margin: 0 0 14px; font-size: 17px; font-weight: 650; }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  fieldset:disabled { opacity: 0.45; }
+
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .field .opt { color: #9aa1ab; }
+  .field input, .field select {
+    width: 100%; padding: 9px 11px; background: #fff;
+    border: 1px solid var(--line); border-radius: 8px;
+  }
+  .field input:focus, .field select:focus { border-color: var(--denim); outline: none; box-shadow: 0 0 0 3px var(--denim-soft); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .total-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 4px 0 14px; padding-top: 12px; border-top: 1px solid var(--line);
+  }
+  .total-line span { color: var(--muted); }
+  .total-line strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+  .form-actions { display: flex; gap: 8px; }
+  .form-actions .primary { flex: 1; }
+  .form-error { color: var(--no); font-size: 13px; min-height: 18px; margin: 0 0 8px; }
+
+  .search-card { padding: 18px 20px; margin-bottom: 16px; }
+  .search-card label { display: block; font-weight: 650; margin-bottom: 8px; }
+  .search-card input {
+    width: 100%; padding: 12px 14px; font-size: 16px;
+    border: 1px solid var(--line); border-radius: 8px;
+  }
+  .search-card input:focus { border-color: var(--denim); outline: none; box-shadow: 0 0 0 3px var(--denim-soft); }
+  .result { margin-top: 12px; padding: 12px 14px; border-radius: 8px; font-size: 15px; }
+  .result strong { font-size: 17px; }
+  .result.yes { background: var(--yes-soft); color: var(--yes); }
+  .result.no { background: var(--no-soft); color: var(--no); }
+
+  .day { margin-bottom: 18px; }
+  .day-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 0 4px 8px;
+  }
+  .day-head h3 { margin: 0; font-size: 15px; font-weight: 650; }
+  .day-head .day-total { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .day-head .day-total b { color: var(--ink); }
+  .sales { list-style: none; margin: 0; padding: 0; overflow: hidden; }
+  .sale {
+    display: grid; grid-template-columns: 1fr auto; gap: 12px;
+    padding: 12px 16px; border-top: 1px solid var(--line);
+  }
+  .sale:first-child { border-top: 0; }
+  .sale .name { font-weight: 600; }
+  .sale .meta { color: var(--muted); font-size: 13px; }
+  .sale .right { text-align: right; font-variant-numeric: tabular-nums; }
+  .sale .amount { font-weight: 650; }
+  .sale .calc { color: var(--muted); font-size: 13px; }
+  .sale .actions { margin-top: 4px; display: flex; gap: 12px; justify-content: flex-end; }
+  .link { background: none; border: 0; padding: 0; color: var(--denim); font-size: 13px; }
+  .link:hover { text-decoration: underline; }
+  .link.danger { color: var(--no); }
+  .tag {
+    display: inline-block; background: var(--denim-soft); color: var(--denim);
+    border-radius: 99px; padding: 0 8px; font-size: 12px; margin-left: 6px;
+  }
+  .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+
+  footer.note { margin-top: 28px; color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .form-card { position: static; }
+    .stats { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Registro de ventas</h1>
+      <p class="sub" id="today"></p>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btn-csv" type="button">Exportar a Excel</button>
+    </div>
+  </header>
+
+  <div class="notice" id="notice" hidden role="alert"></div>
+  <div class="filebar" id="filebar" hidden></div>
+
+  <section class="stats" aria-label="Resumen">
+    <div class="stat"><div class="label">Vendido hoy</div><div class="value" id="st-today">$ 0</div></div>
+    <div class="stat"><div class="label">Prendas vendidas hoy</div><div class="value" id="st-units">0</div></div>
+    <div class="stat"><div class="label">Vendido este mes</div><div class="value" id="st-month">$ 0</div></div>
+  </section>
+
+  <main class="layout">
+
+    <aside class="card form-card">
+      <h2 id="form-title">Nueva venta</h2>
+      <form id="form" autocomplete="off" novalidate>
+        <fieldset id="fs" disabled>
+          <div class="field">
+            <label for="f-date">Fecha</label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="field">
+            <label for="f-item">Prenda</label>
+            <input type="text" id="f-item" list="dl-items" placeholder="Ej: Remera, Jean, Campera" required>
+            <datalist id="dl-items"></datalist>
+          </div>
+          <div class="field">
+            <label for="f-details">Detalles <span class="opt">(opcional)</span></label>
+            <input type="text" id="f-details" placeholder="Talle, color, marca, código...">
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="f-price">Precio</label>
+              <input type="number" id="f-price" min="0" step="any" inputmode="decimal" placeholder="0" required>
+            </div>
+            <div class="field">
+              <label for="f-qty">Cantidad</label>
+              <input type="number" id="f-qty" min="1" step="1" value="1" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-client">Cliente <span class="opt">(opcional)</span></label>
+            <input type="text" id="f-client" list="dl-clients" placeholder="Nombre o apodo">
+            <datalist id="dl-clients"></datalist>
+          </div>
+          <div class="field">
+            <label for="f-pay">Forma de pago</label>
+            <select id="f-pay">
+              <option>Efectivo</option>
+              <option>Transferencia</option>
+              <option>Débito</option>
+              <option>Crédito</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="total-line"><span>Total de la venta</span><strong id="f-total">$ 0</strong></div>
+          <p class="form-error" id="form-error" role="alert"></p>
+          <div class="form-actions">
+            <button class="btn primary" type="submit" id="btn-submit">Guardar venta</button>
+            <button class="btn" type="button" id="btn-cancel" hidden>Cancelar</button>
+          </div>
+        </fieldset>
+      </form>
+    </aside>
+
+    <section>
+      <div class="card search-card">
+        <label for="search">¿Se vendió algo? Buscá por prenda, detalle o cliente</label>
+        <input type="search" id="search" placeholder="Ej: jean azul, campera, María">
+        <div class="result" id="result" hidden></div>
+      </div>
+
+      <div id="list"></div>
+    </section>
+
+  </main>
+
+  <footer class="note" id="foot"></footer>
+</div>
+
+<script>
+(function () {
+  var KEY = 'registro-ventas-v1'; // solo para navegadores sin acceso a archivos
+  var FS = typeof window.showSaveFilePicker === 'function' && typeof window.showOpenFilePicker === 'function';
+  var PICK_TYPES = [{ description: 'Registro de ventas (.json)', accept: { 'application/json': ['.json'] } }];
+
+  var sales = [];
+  var editingId = null;
+  var status = FS ? 'loading' : 'local';   // loading | none | needperm | ready | local
+  var fileHandle = null;
+  var fileMsg = '';
+  var showChooser = false;
+  var lastSaved = null;
+  var writeQueue = Promise.resolve();
+
+  var money = new Intl.NumberFormat('es-UY', { style: 'currency', currency: 'UYU', maximumFractionDigits: 0 });
+  function fmtMoney(n) { return money.format(Number(n) || 0); }
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function norm(s) {
+    return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function parseDate(str) {
+    var p = str.split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]);
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function fmtLong(str) {
+    return cap(parseDate(str).toLocaleDateString('es-UY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+  }
+  function canSave() { return status === 'ready' || status === 'local'; }
+
+  function setNotice(msg) {
+    var n = $('notice');
+    if (msg) { n.textContent = msg; n.hidden = false; } else { n.hidden = true; }
+  }
+
+  /* ---------- memoria del archivo elegido (IndexedDB) ---------- */
+  function idb() {
+    return new Promise(function (res, rej) {
+      var r = indexedDB.open('registro-ventas-archivo', 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore('h'); };
+      r.onsuccess = function () { res(r.result); };
+      r.onerror = function () { rej(r.error); };
+    });
+  }
+  function idbGet(k) {
+    return idb().then(function (db) {
+      return new Promise(function (res, rej) {
+        var q = db.transaction('h').objectStore('h').get(k);
+        q.onsuccess = function () { res(q.result); };
+        q.onerror = function () { rej(q.error); };
+      });
+    });
+  }
+  function idbSet(k, v) {
+    return idb().then(function (db) {
+      return new Promise(function (res, rej) {
+        var t = db.transaction('h', 'readwrite');
+        t.objectStore('h').put(v, k);
+        t.oncomplete = function () { res(); };
+        t.onerror = function () { rej(t.error); };
+      });
+    });
+  }
+
+  /* ---------- guardado en archivo ---------- */
+  function cleanSales(arr) {
+    if (!Array.isArray(arr)) throw new Error('formato');
+    return arr.map(function (s, i) {
+      if (!s || !s.date || !s.item || isNaN(s.price) || isNaN(s.qty)) throw new Error('formato');
+      return {
+        id: s.id || ('s' + Date.now() + i),
+        createdAt: s.createdAt || (Date.now() + i),
+        date: String(s.date), item: String(s.item), details: String(s.details || ''),
+        price: Number(s.price), qty: Number(s.qty),
+        client: String(s.client || ''), payment: String(s.payment || '')
+      };
+    });
+  }
+  function readFile(h) {
+    return h.getFile().then(function (f) { return f.text(); }).then(function (text) {
+      if (!text.trim()) return [];
+      var data = JSON.parse(text);
+      return cleanSales(Array.isArray(data) ? data : data.ventas);
+    });
+  }
+  function ensurePerm(h) {
+    return h.queryPermission({ mode: 'readwrite' }).then(function (p) {
+      return p === 'granted' ? p : h.requestPermission({ mode: 'readwrite' });
+    }).then(function (p) {
+      if (p !== 'granted') throw new Error('perm');
+    });
+  }
+  function persist() {
+    if (status === 'local') { saveLocal(); return; }
+    if (status !== 'ready' || !fileHandle) return;
+    var h = fileHandle;
+    var payload = JSON.stringify({ app: 'registro-ventas', version: 1, ventas: sales }, null, 2);
+    writeQueue = writeQueue.then(function () {
+      return h.createWritable().then(function (w) {
+        return w.write(payload).then(function () { return w.close(); });
+      });
+    }).then(function () {
+      lastSaved = new Date();
+      setNotice('');
+      renderFileBar();
+    }, function () {
+      setNotice('No se pudo guardar en el archivo. Revisá que no esté abierto o bloqueado por otro programa y probá de nuevo.');
+    });
+  }
+  function connect(h) {
+    return ensurePerm(h).then(function () { return readFile(h); }).then(function (arr) {
+      fileHandle = h; sales = arr; status = 'ready';
+      fileMsg = ''; showChooser = false; lastSaved = null;
+      idbSet('file', h).catch(function () {});
+      setNotice('');
+      resetForm(true);
+      render();
+      renderFileBar();
+    });
+  }
+  function onPickError(e) {
+    if (e && e.name === 'AbortError') return;
+    if (e && e.message === 'formato') fileMsg = 'Ese archivo no parece ser un registro de ventas válido.';
+    else if (e && e.message === 'perm') fileMsg = 'Sin permiso no se puede usar el archivo.';
+    else fileMsg = 'No se pudo abrir el archivo. ¿Lo movieron o lo borraron?';
+    renderFileBar();
+  }
+  function createFile() {
+    window.showSaveFilePicker({ suggestedName: 'ventas.json', types: PICK_TYPES }).then(function (h) {
+      return ensurePerm(h).then(function () {
+        fileHandle = h; sales = []; status = 'ready';
+        fileMsg = ''; showChooser = false;
+        idbSet('file', h).catch(function () {});
+        setNotice('');
+        resetForm(true);
+        persist();
+        render();
+        renderFileBar();
+      });
+    }).catch(onPickError);
+  }
+  function openFile() {
+    window.showOpenFilePicker({ types: PICK_TYPES, multiple: false }).then(function (hs) {
+      return connect(hs[0]);
+    }).catch(onPickError);
+  }
+  function grant() {
+    connect(fileHandle).catch(onPickError);
+  }
+
+  /* ---------- respaldo para navegadores sin acceso a archivos ---------- */
+  function loadLocal() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      var d = raw ? JSON.parse(raw) : [];
+      sales = Array.isArray(d) ? d : [];
+    } catch (e) {
+      sales = [];
+      setNotice('No se pudo leer lo guardado en este navegador.');
+    }
+  }
+  function saveLocal() {
+    try { localStorage.setItem(KEY, JSON.stringify(sales)); }
+    catch (e) { setNotice('No se pudo guardar en este navegador. Las ventas se perderán al cerrar la página.'); }
+  }
+
+  /* ---------- barra de estado del archivo ---------- */
+  function chooserButtons() {
+    return '<button type="button" class="btn small" data-fa="create">Crear archivo nuevo</button>' +
+           '<button type="button" class="btn small" data-fa="open">Abrir archivo existente</button>';
+  }
+  function renderFileBar() {
+    var el = $('filebar');
+    var name = fileHandle ? esc(fileHandle.name) : '';
+    var html = '', cls = 'filebar';
+    if (status === 'loading') { el.hidden = true; updateEnabled(); return; }
+    el.hidden = false;
+    if (status === 'ready') {
+      var when = lastSaved ? ' <span class="muted">· guardado a las ' + pad(lastSaved.getHours()) + ':' + pad(lastSaved.getMinutes()) + '</span>' : '';
+      html = '<span class="dot ok"></span><span class="grow">Guardando en <b>' + name + '</b>' + when + '</span>' +
+             '<button type="button" class="link" data-fa="toggle">Cambiar archivo</button>' +
+             (showChooser ? chooserButtons() : '');
+    } else if (status === 'needperm') {
+      cls += ' attn';
+      html = '<span class="dot warn"></span><span class="grow">Para seguir usando <b>' + name + '</b>, el navegador pide permiso otra vez.</span>' +
+             '<button type="button" class="btn primary small" data-fa="grant">Permitir acceso</button>' +
+             '<button type="button" class="link" data-fa="toggle">Usar otro archivo</button>' +
+             (showChooser ? chooserButtons() : '');
+    } else if (status === 'none') {
+      cls += ' attn';
+      html = '<span class="grow"><b>Elegí dónde guardar las ventas.</b> Conviene que sea en la misma carpeta donde está esta herramienta.</span>' +
+             chooserButtons();
+    } else {
+      cls += ' attn';
+      html = '<span class="dot warn"></span><span class="grow">Este navegador no puede guardar en un archivo, así que las ventas quedan dentro del navegador. Para guardarlas en un archivo, abrí esta herramienta con Chrome o Edge.</span>';
+    }
+    if (fileMsg) html += '<div class="filemsg">' + esc(fileMsg) + '</div>';
+    el.className = cls;
+    el.innerHTML = html;
+    updateEnabled();
+  }
+  function updateEnabled() {
+    $('fs').disabled = !canSave();
+    var foot = $('foot');
+    foot.textContent = status === 'local'
+      ? 'Las ventas se guardan dentro de este navegador. Usá “Exportar a Excel” para tener una copia.'
+      : 'Las ventas se guardan en un archivo de tu computadora (por ejemplo ventas.json). Podés copiarlo como copia de seguridad; para verlas en Excel usá “Exportar a Excel”.';
+  }
+
+  /* ---------- formulario ---------- */
+  function updateFormTotal() {
+    var p = parseFloat($('f-price').value) || 0;
+    var q = parseInt($('f-qty').value, 10) || 0;
+    $('f-total').textContent = fmtMoney(p * q);
+  }
+  function resetForm(keepDate) {
+    var date = keepDate ? $('f-date').value : todayStr();
+    var pay = $('f-pay').value;
+    $('form').reset();
+    $('f-date').value = date || todayStr();
+    $('f-pay').value = pay || 'Efectivo';
+    $('f-qty').value = 1;
+    editingId = null;
+    $('form-title').textContent = 'Nueva venta';
+    $('btn-submit').textContent = 'Guardar venta';
+    $('btn-cancel').hidden = true;
+    $('form-error').textContent = '';
+    updateFormTotal();
+  }
+  function startEdit(id) {
+    var s = sales.filter(function (x) { return x.id === id; })[0];
+    if (!s) return;
+    editingId = id;
+    $('f-date').value = s.date;
+    $('f-item').value = s.item;
+    $('f-details').value = s.details || '';
+    $('f-price').value = s.price;
+    $('f-qty').value = s.qty;
+    $('f-client').value = s.client || '';
+    $('f-pay').value = s.payment || 'Efectivo';
+    $('form-title').textContent = 'Editar venta';
+    $('btn-submit').textContent = 'Guardar cambios';
+    $('btn-cancel').hidden = false;
+    $('form-error').textContent = '';
+    updateFormTotal();
+    $('f-item').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function onSubmit(ev) {
+    ev.preventDefault();
+    if (!canSave()) { $('form-error').textContent = 'Primero elegí el archivo donde se guardan las ventas.'; return; }
+    var item = $('f-item').value.trim();
+    var price = parseFloat($('f-price').value);
+    var qty = parseInt($('f-qty').value, 10);
+    var date = $('f-date').value;
+    var err = '';
+    if (!date) err = 'Elegí la fecha de la venta.';
+    else if (!item) err = 'Escribí qué prenda se vendió.';
+    else if (isNaN(price) || price < 0) err = 'Ingresá un precio válido.';
+    else if (isNaN(qty) || qty < 1) err = 'La cantidad debe ser al menos 1.';
+    if (err) { $('form-error').textContent = err; return; }
+
+    var record = {
+      date: date,
+      item: item,
+      details: $('f-details').value.trim(),
+      price: price,
+      qty: qty,
+      client: $('f-client').value.trim(),
+      payment: $('f-pay').value
+    };
+    if (editingId) {
+      sales = sales.map(function (s) {
+        return s.id === editingId ? Object.assign({}, s, record) : s;
+      });
+    } else {
+      record.id = 's' + Date.now() + Math.floor(Math.random() * 1000);
+      record.createdAt = Date.now();
+      sales.push(record);
+    }
+    persist();
+    resetForm(true);
+    render();
+    $('f-item').focus();
+  }
+
+  /* ---------- listado y búsqueda ---------- */
+  function render() {
+    renderStats();
+    renderSuggestions();
+
+    var q = norm($('search').value.trim());
+    var tokens = q ? q.split(/\s+/) : [];
+    var list = sales.slice();
+    if (tokens.length) {
+      list = list.filter(function (s) {
+        var hay = norm([s.item, s.details, s.client, s.payment].join(' '));
+        return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
+      });
+    }
+    list.sort(function (a, b) {
+      return b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0);
+    });
+
+    renderResult(tokens.length > 0, list);
+
+    var box = $('list');
+    if (!list.length) {
+      if (tokens.length) box.innerHTML = '';
+      else if (!canSave()) box.innerHTML = '<div class="card empty">Elegí el archivo de datos para ver y registrar ventas.</div>';
+      else box.innerHTML = '<div class="card empty">Todavía no hay ventas registradas.<br>Cargá la primera con el formulario.</div>';
+      return;
+    }
+
+    var groups = [];
+    var map = {};
+    list.forEach(function (s) {
+      if (!map[s.date]) { map[s.date] = { date: s.date, items: [] }; groups.push(map[s.date]); }
+      map[s.date].items.push(s);
+    });
+
+    var today = todayStr();
+    box.innerHTML = groups.map(function (g) {
+      var total = 0, units = 0;
+      g.items.forEach(function (s) { total += s.price * s.qty; units += s.qty; });
+      var title = fmtLong(g.date) + (g.date === today ? ' (hoy)' : '');
+      var rows = g.items.map(function (s) {
+        var meta = [];
+        if (s.details) meta.push(esc(s.details));
+        if (s.client) meta.push('Cliente: ' + esc(s.client));
+        return '<li class="sale">' +
+          '<div>' +
+            '<div class="name">' + esc(s.item) + '<span class="tag">' + esc(s.payment || '') + '</span></div>' +
+            (meta.length ? '<div class="meta">' + meta.join(' · ') + '</div>' : '') +
+          '</div>' +
+          '<div class="right">' +
+            '<div class="amount">' + fmtMoney(s.price * s.qty) + '</div>' +
+            '<div class="calc">' + s.qty + ' × ' + fmtMoney(s.price) + '</div>' +
+            '<div class="actions">' +
+              '<button type="button" class="link" data-act="edit" data-id="' + esc(s.id) + '">Editar</button>' +
+              '<button type="button" class="link danger" data-act="del" data-id="' + esc(s.id) + '">Eliminar</button>' +
+            '</div>' +
+          '</div>' +
+        '</li>';
+      }).join('');
+      return '<section class="day">' +
+        '<div class="day-head"><h3>' + esc(title) + '</h3>' +
+        '<span class="day-total">' + units + (units === 1 ? ' prenda' : ' prendas') + ' · <b>' + fmtMoney(total) + '</b></span></div>' +
+        '<ul class="card sales">' + rows + '</ul></section>';
+    }).join('');
+  }
+
+  function renderResult(searching, list) {
+    var el = $('result');
+    if (!searching) { el.hidden = true; return; }
+    el.hidden = false;
+    if (list.length) {
+      var units = 0;
+      list.forEach(function (s) { units += s.qty; });
+      el.className = 'result yes';
+      el.innerHTML = '<strong>Sí, se vendió.</strong> ' +
+        list.length + (list.length === 1 ? ' venta' : ' ventas') + ' (' + units + (units === 1 ? ' unidad' : ' unidades') + '). ' +
+        'Última: ' + esc(fmtLong(list[0].date)) + '.';
+    } else {
+      el.className = 'result no';
+      el.innerHTML = '<strong>No se encontró ninguna venta</strong> con esa búsqueda.';
+    }
+  }
+
+  function renderStats() {
+    var today = todayStr();
+    var month = today.slice(0, 7);
+    var t = 0, u = 0, m = 0;
+    sales.forEach(function (s) {
+      var amt = s.price * s.qty;
+      if (s.date === today) { t += amt; u += s.qty; }
+      if (s.date.slice(0, 7) === month) m += amt;
+    });
+    $('st-today').textContent = fmtMoney(t);
+    $('st-units').textContent = u;
+    $('st-month').textContent = fmtMoney(m);
+    $('today').textContent = fmtLong(today);
+  }
+
+  function renderSuggestions() {
+    function uniq(key) {
+      var seen = {}, out = [];
+      sales.forEach(function (s) {
+        var v = (s[key] || '').trim();
+        var k = norm(v);
+        if (v && !seen[k]) { seen[k] = 1; out.push(v); }
+      });
+      return out.sort().map(function (v) { return '<option value="' + esc(v) + '">'; }).join('');
+    }
+    $('dl-items').innerHTML = uniq('item');
+    $('dl-clients').innerHTML = uniq('client');
+  }
+
+  /* ---------- exportar a Excel ---------- */
+  function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
+  function exportCSV() {
+    if (!sales.length) { alert('Todavía no hay ventas para exportar.'); return; }
+    var rows = [['Fecha', 'Prenda', 'Detalles', 'Cantidad', 'Precio unitario', 'Total', 'Cliente', 'Forma de pago']];
+    sales.slice().sort(function (a, b) { return a.date.localeCompare(b.date); }).forEach(function (s) {
+      rows.push([s.date, s.item, s.details, s.qty, s.price, s.price * s.qty, s.client, s.payment]);
+    });
+    var text = rows.map(function (r) { return r.map(csvCell).join(';'); }).join('\r\n');
+    var blob = new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ventas-' + todayStr() + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  /* ---------- eventos ---------- */
+  $('form').addEventListener('submit', onSubmit);
+  $('f-price').addEventListener('input', updateFormTotal);
+  $('f-qty').addEventListener('input', updateFormTotal);
+  $('btn-cancel').addEventListener('click', function () { resetForm(true); });
+  $('search').addEventListener('input', render);
+  $('btn-csv').addEventListener('click', exportCSV);
+  $('filebar').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-fa]');
+    if (!b) return;
+    var a = b.getAttribute('data-fa');
+    if (a === 'create') createFile();
+    else if (a === 'open') openFile();
+    else if (a === 'grant') grant();
+    else if (a === 'toggle') { showChooser = !showChooser; renderFileBar(); }
+  });
+  $('list').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]');
+    if (!b) return;
+    var id = b.getAttribute('data-id');
+    if (b.getAttribute('data-act') === 'edit') startEdit(id);
+    if (b.getAttribute('data-act') === 'del') {
+      if (confirm('¿Eliminar esta venta? No se puede deshacer.')) {
+        sales = sales.filter(function (s) { return s.id !== id; });
+        if (editingId === id) resetForm(true);
+        persist();
+        render();
+      }
+    }
+  });
+
+  /* ---------- inicio ---------- */
+  resetForm(false);
+  render();
+  renderFileBar();
+
+  if (!FS) {
+    loadLocal();
+    render();
+  } else {
+    idbGet('file').then(function (h) {
+      if (!h) { status = 'none'; return; }
+      fileHandle = h;
+      return h.queryPermission({ mode: 'readwrite' }).then(function (p) {
+        if (p === 'granted') return connect(h);
+        status = 'needperm';
+      });
+    }).catch(function () {
+      if (status === 'loading') {
+        if (fileHandle) { status = 'needperm'; fileMsg = 'No se pudo abrir el archivo anterior. Permití el acceso o elegí otro.'; }
+        else status = 'none';
+      }
+    }).then(function () {
+      renderFileBar();
+      render();
+    });
+  }
+})();
+</script>
+</body>
+</html>
