@@ -1,0 +1,259 @@
+[
+  {
+    "id": "win-ipconfig",
+    "categoria": "redes",
+    "comando": "ipconfig",
+    "descripciones": [
+      "Ver la dirección IP de mi computadora y la red local",
+      "Revisar la configuración de red de Windows",
+      "Saber mi puerta de enlace predeterminada"
+    ],
+    "tags": [
+      "windows",
+      "red",
+      "ip",
+      "ipconfig",
+      "internet"
+    ]
+  },
+  {
+    "id": "win-ping",
+    "categoria": "redes",
+    "comando": "ping <DIRECCION>",
+    "descripciones": [
+      "Comprobar si hay conexión con una página web o servidor",
+      "Ver si responde una IP específica",
+      "Medir la latencia de red"
+    ],
+    "tags": [
+      "windows",
+      "ping",
+      "red",
+      "conexion",
+      "latencia"
+    ]
+  },
+  {
+    "id": "win-tasklist",
+    "categoria": "sistema",
+    "comando": "tasklist",
+    "descripciones": [
+      "Ver todos los procesos y programas ejecutándose en Windows",
+      "Listar aplicaciones activas y su consumo",
+      "Ver el Administrador de tareas en modo texto"
+    ],
+    "tags": [
+      "windows",
+      "procesos",
+      "tasklist",
+      "sistema",
+      "memoria"
+    ]
+  },
+  {
+    "id": "win-taskkill",
+    "categoria": "sistema",
+    "comando": "taskkill /f /im <NOMBRE_PROCESO.exe>",
+    "descripciones": [
+      "Forzar el cierre de un programa que se trabó",
+      "Matar un proceso por su nombre en Windows",
+      "Cerrar una aplicación que no responde"
+    ],
+    "tags": [
+      "windows",
+      "taskkill",
+      "cerrar",
+      "proceso",
+      "forzar"
+    ]
+  },
+  {
+    "id": "win-sfc",
+    "categoria": "mantenimiento",
+    "comando": "sfc /scannow",
+    "descripciones": [
+      "Reparar archivos del sistema de Windows dañados o corruptos",
+      "Escanear la integridad de los archivos del sistema operativo",
+      "Solucionar errores internos de Windows"
+    ],
+    "tags": [
+      "windows",
+      "sfc",
+      "reparar",
+      "sistema",
+      "errores"
+    ]
+  },
+  {
+    "id": "win-cls",
+    "categoria": "consola",
+    "comando": "cls",
+    "descripciones": [
+      "Limpiar la pantalla de la terminal",
+      "Borrar todo lo escrito en la consola",
+      "Dejar la pantalla limpia"
+    ],
+    "tags": [
+      "windows",
+      "cls",
+      "limpiar",
+      "pantalla",
+      "terminal"
+    ]
+  },
+  {
+    "id": "win-dir",
+    "categoria": "archivos",
+    "comando": "dir",
+    "descripciones": [
+      "Mostrar los archivos y carpetas del directorio actual",
+      "Listar el contenido de la carpeta en la que estoy",
+      "Ver qué hay en este directorio"
+    ],
+    "tags": [
+      "windows",
+      "dir",
+      "archivos",
+      "carpetas",
+      "listar"
+    ]
+  },
+  {
+    "id": "win-shutdown",
+    "categoria": "sistema",
+    "comando": "shutdown /s /t 0",
+    "descripciones": [
+      "Apagar la computadora de inmediato desde la consola",
+      "Apagado forzoso de Windows",
+      "Cerrar el equipo por comandos"
+    ],
+    "tags": [
+      "windows",
+      "shutdown",
+      "apagar",
+      "sistema"
+    ]
+  },
+ 
+  {
+    "id": "gcc-archivo-c-o-nombre",
+    "categoria": "desarrollo",
+    "comando": "gcc .\\<ARCHIVO>.c -o <NOMBRE>",
+    "descripciones": [
+      "Crear ejecutable a partir de un archivo C",
+      "Compilar código en C para generar un archivo .exe",
+      "Convertir un script de C en un programa ejecutable"
+    ],
+    "tags": ["windows", "desarrollo", "c", "gcc", "compilar", "ejecutable"]
+  },
+  {
+    "id": "node-run-script",
+    "categoria": "desarrollo",
+    "comando": "node <ARCHIVO>.js",
+    "descripciones": [
+      "Ejecutar un archivo de JavaScript directamente en la terminal",
+      "Correr un script con Node.js",
+      "Probar código JS sin navegador"
+    ],
+    "tags": ["windows", "desarrollo", "node", "javascript", "ejecutar"]
+  },
+  {
+    "id": "python-run-script",
+    "categoria": "desarrollo",
+    "comando": "python <ARCHIVO>.py",
+    "descripciones": [
+      "Ejecutar un script de Python desde la consola",
+      "Correr un programa en Python",
+      "Iniciar código de Python"
+    ],
+    "tags": ["windows", "desarrollo", "python", "script", "ejecutar"]
+  },
+  {
+    "id": "npm-install-deps",
+    "categoria": "desarrollo",
+    "comando": "npm install",
+    "descripciones": [
+      "Instalar todas las dependencias y librerías del proyecto Node.js",
+      "Descargar los paquetes necesarios de package.json",
+      "Preparar el entorno de node_modules"
+    ],
+    "tags": ["windows", "desarrollo", "npm", "node", "dependencias", "instalar"]
+  },
+  {
+    "id": "pip-install-package",
+    "categoria": "desarrollo",
+    "comando": "pip install <LIBRERIA>",
+    "descripciones": [
+      "Instalar una librería o paquete externo para Python",
+      "Agregar dependencias a mi entorno de Python",
+      "Descargar módulo con pip"
+    ],
+    "tags": ["windows", "desarrollo", "python", "pip", "libreria", "instalar"]
+  },
+  {
+    "id": "win-findstr",
+    "categoria": "busqueda",
+    "comando": "findstr /s /i \"<TEXTO>\" *.*",
+    "descripciones": [
+      "Buscar una palabra o texto dentro de archivos en Windows",
+      "Encontrar cadenas de texto en múltiples carpetas",
+      "El grep nativo de la terminal de Windows"
+    ],
+    "tags": ["windows", "busqueda", "texto", "findstr", "archivos"]
+  },
+  {
+    "id": "win-set-env",
+    "categoria": "sistema",
+    "comando": "set <NOMBRE_VARIABLE>=<VALOR>",
+    "descripciones": [
+      "Definir una variable de entorno temporal en la sesión actual de la consola",
+      "Crear o modificar una variable para que la lea mi script",
+      "Configurar entorno al vuelo"
+    ],
+    "tags": ["windows", "sistema", "variables", "entorno", "set"]
+  },
+  {
+    "id": "win-where",
+    "categoria": "sistema",
+    "comando": "where <EJECUTABLE>",
+    "descripciones": [
+      "Encontrar la ruta exacta donde está instalado un programa o comando",
+      "Saber si una herramienta está agregada al PATH",
+      "Localizar dónde vive un ejecutable en mi PC"
+    ],
+    "tags": ["windows", "sistema", "path", "where", "buscar"]
+  },
+  {
+    "id": "win-tree",
+    "categoria": "archivos",
+    "comando": "tree /f /a",
+    "descripciones": [
+      "Ver la estructura de carpetas y archivos en forma de árbol",
+      "Dibujar en texto todo el árbol de directorios del proyecto",
+      "Visualizar la jerarquía de archivos"
+    ],
+    "tags": ["windows", "archivos", "tree", "estructura", "directorios"]
+  },
+  {
+    "id": "win-robocopy",
+    "categoria": "archivos",
+    "comando": "robocopy \"<ORIGEN>\" \"<DESTINO>\" /s",
+    "descripciones": [
+      "Copiar carpetas enteras de forma rápida y robusta",
+      "Hacer respaldo de directorios completos con subcarpetas",
+      "Clonar directorios en Windows de forma avanzada"
+    ],
+    "tags": ["windows", "archivos", "robocopy", "copiar", "respaldo"]
+  },
+  {
+    "id": "win-powershell-bypass",
+    "categoria": "consola",
+    "comando": "powershell -ExecutionPolicy Bypass -File <SCRIPT>.ps1",
+    "descripciones": [
+      "Ejecutar un script de PowerShell saltándose las restricciones de seguridad",
+      "Correr un archivo .ps1 bloqueado por políticas de Windows",
+      "Forzar la ejecución de scripts locales"
+    ],
+    "tags": ["windows", "powershell", "script", "bypass", "seguridad"]
+  }
+]

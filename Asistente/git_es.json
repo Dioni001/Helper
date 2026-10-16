@@ -1,0 +1,101 @@
+[
+  {
+    "id": "git-clone",
+    "categoria": "git",
+    "comando": "git clone <URL_REPOSITORIO>",
+    "descripciones": [
+      "Descargar un repositorio completo en mi computadora",
+      "Clonar un proyecto remoto",
+      "Traer el repositorio de GitHub"
+    ],
+    "tags": ["git", "clone", "descargar", "repositorio"]
+  },
+  {
+    "id": "git-status",
+    "categoria": "git",
+    "comando": "git status",
+    "descripciones": [
+      "Ver qué archivos cambié y cuáles están listos para guardar",
+      "Revisar el estado actual del repositorio",
+      "Saber qué modificaciones no se han guardado"
+    ],
+    "tags": ["git", "status", "estado", "cambios"]
+  },
+  {
+    "id": "git-add",
+    "categoria": "git",
+    "comando": "git add <ARCHIVO>",
+    "descripciones": [
+      "Preparar un archivo para ser guardado en el próximo commit",
+      "Añadir archivos al área de staging",
+      "Marcar cambios para guardar"
+    ],
+    "tags": ["git", "add", "staging", "preparar"]
+  },
+  {
+    "id": "git-commit",
+    "categoria": "git",
+    "comando": "git commit -m \"<MENSAJE>\"",
+    "descripciones": [
+      "Guardar los cambios preparados con un mensaje descriptivo",
+      "Crear un commit con los archivos en staging",
+      "Registrar una nueva versión en el historial"
+    ],
+    "tags": ["git", "commit", "guardar", "historial"]
+  },
+  {
+    "id": "git-push",
+    "categoria": "git",
+    "comando": "git push origin <RAMA>",
+    "descripciones": [
+      "Subir mis commits locales al repositorio remoto en internet",
+      "Enviar los cambios a GitHub",
+      "Publicar mi código"
+    ],
+    "tags": ["git", "push", "subir", "remoto", "github"]
+  },
+  {
+    "id": "git-pull",
+    "categoria": "git",
+    "comando": "git pull",
+    "descripciones": [
+      "Descargar y fusionar los últimos cambios del repositorio remoto",
+      "Actualizar mi proyecto con lo que subieron otros",
+      "Traer cambios de internet a mi máquina"
+    ],
+    "tags": ["git", "pull", "actualizar", "descargar", "remoto"]
+  },
+  {
+    "id": "git-branch",
+    "categoria": "git",
+    "comando": "git branch",
+    "descripciones": [
+      "Ver todas las ramas que tengo en el repositorio",
+      "Listar ramas locales",
+      "Saber en qué ramas estoy trabajando"
+    ],
+    "tags": ["git", "branch", "ramas", "listar"]
+  },
+  {
+    "id": "git-checkout",
+    "categoria": "git",
+    "comando": "git checkout <NOMBRE_RAMA>",
+    "descripciones": [
+      "Cambiarme de una rama a otra",
+      "Moverme a otra rama de trabajo",
+      "Salto de rama"
+    ],
+    "tags": ["git", "checkout", "rama", "cambiar"]
+  },
+  {
+    "id": "git-log",
+    "categoria": "git",
+    "comando": "git log --oneline",
+    "descripciones": [
+      "Ver el historial de commits resumido en una línea por cambio",
+      "Revisar qué se ha hecho en el proyecto paso a paso",
+      "Ver los commits anteriores de forma rápida"
+    ],
+    "tags": ["git", "log", "historial", "commits", "resumen"]
+  }
+]

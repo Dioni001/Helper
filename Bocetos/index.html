@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador Geométrico Humano v3</title>
     <style>
         body { 
@@ -36,6 +37,11 @@
         }
         .btn-save { background: #4CAF50; color: white; }
         .btn-upload { background: #333; color: white; border: 1px solid #777; }
+        .btn-reset { background: #333; color: #e0e0e0; border: 1px solid #777; }
+        .aviso {
+            font-size: 12px; color: #f59e0b; min-height: 16px; margin-top: 10px;
+        }
+        svg { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
@@ -53,7 +59,9 @@
                     Cargar (.txt)
                     <input type="file" accept=".txt" style="display: none;" onchange="cargarModelo(event)">
                 </label>
+                <button class="btn-reset" onclick="restablecerModelo()">Restablecer</button>
             </div>
+            <div class="aviso" id="aviso"></div>
         </div>
 
         <div id="render-zone"></div>
@@ -61,7 +69,7 @@
 
     <script>
         // Objeto central de medidas
-        const medidas = {
+        const medidasPorDefecto = {
             estatura: 175,
             cuello: 42,
             hombros: 55,
@@ -72,8 +80,41 @@
             muslo: 60,
             entrepierna: 85
         };
+        const medidas = { ...medidasPorDefecto };
+
+        // Mínimos razonables para que la figura no se rompa visualmente.
+        // No son medidas "correctas", solo evitan valores imposibles (0, negativos).
+        const minimos = {
+            estatura: 50, cuello: 10, hombros: 10, pecho: 20,
+            biceps: 5, cintura: 20, cadera: 20, muslo: 10, entrepierna: 10
+        };
 
         const getDiametro = (perimetro) => perimetro / Math.PI;
+        const avisoEl = () => document.getElementById("aviso");
+
+        // Ajusta un valor a un rango válido y devuelve el valor final.
+        // También valida la relación entre entrepierna y estatura, que es
+        // la que más rompía el dibujo (cadera terminando arriba de la cabeza).
+        function clampMedida(clave, valorCrudo) {
+            let valor = Number(valorCrudo);
+            if (!isFinite(valor)) valor = medidasPorDefecto[clave];
+
+            const minimo = minimos[clave] ?? 1;
+            if (valor < minimo) valor = minimo;
+
+            if (clave === "entrepierna") {
+                const limiteSuperior = medidas.estatura - 35; // deja lugar a cabeza y cuello
+                if (valor > limiteSuperior) valor = Math.max(minimo, limiteSuperior);
+            }
+            if (clave === "estatura") {
+                // Si la estatura baja, la entrepierna no puede quedar más alta que la cabeza
+                const limiteEntrepierna = valor - 35;
+                if (medidas.entrepierna > limiteEntrepierna) {
+                    medidas.entrepierna = Math.max(minimos.entrepierna, limiteEntrepierna);
+                }
+            }
+            return valor;
+        }
 
         // 1. GENERADOR DEL SVG
         function generarSVG() {
@@ -160,18 +201,44 @@
                 div.className = "control-group";
                 div.innerHTML = `
                     <label>${nombreLabel}</label>
-                    <input type="number" id="input-${clave}" value="${valor}" step="0.5" oninput="actualizarMedida('${clave}', this.value)">
+                    <input type="number" id="input-${clave}" value="${valor}" step="0.5" min="${minimos[clave] ?? 1}" oninput="actualizarMedida('${clave}', this.value)">
                 `;
                 contenedor.appendChild(div);
             }
         }
 
-        function actualizarMedida(clave, valor) {
-            const num = parseFloat(valor);
-            if (!isNaN(num)) {
-                medidas[clave] = num;
-                generarSVG(); // Re-dibujar en tiempo real
+        function actualizarMedida(clave, valorCrudo) {
+            // Mientras se está escribiendo (campo vacío o "-" suelto) no corregimos
+            // todavía, para no pelear con el cursor del usuario.
+            if (valorCrudo === "" || valorCrudo === "-") return;
+
+            const num = parseFloat(valorCrudo);
+            if (isNaN(num)) return;
+
+            const ajustado = clampMedida(clave, num);
+            medidas[clave] = ajustado;
+
+            if (ajustado !== num) {
+                avisoEl().textContent = `"${clave}" se ajustó a ${ajustado} para que la figura no se deforme.`;
+            } else {
+                avisoEl().textContent = "";
             }
+
+            // Reflejar el valor corregido en su propio input y, si cambió la
+            // entrepierna por efecto de la estatura, también en el suyo.
+            document.getElementById(`input-${clave}`).value = ajustado;
+            document.getElementById(`input-entrepierna`).value = medidas.entrepierna;
+
+            generarSVG(); // Re-dibujar en tiempo real
+        }
+
+        function restablecerModelo() {
+            Object.assign(medidas, medidasPorDefecto);
+            for (const clave of Object.keys(medidas)) {
+                document.getElementById(`input-${clave}`).value = medidas[clave];
+            }
+            avisoEl().textContent = "";
+            generarSVG();
         }
 
         // 3. GUARDAR Y CARGAR .TXT
@@ -198,6 +265,7 @@
 
             const lector = new FileReader();
             lector.onload = function(e) {
+                let huboAjustes = false;
                 const lineas = e.target.result.split('\n');
                 lineas.forEach(linea => {
                     if (linea.trim() === "") return;
@@ -206,14 +274,22 @@
                         const clave = partes[0].trim();
                         const valor = parseFloat(partes[1].trim());
                         if (medidas.hasOwnProperty(clave) && !isNaN(valor)) {
-                            medidas[clave] = valor;
-                            // Actualizar también el valor visual en la cajita del input
-                            document.getElementById(`input-${clave}`).value = valor;
+                            const ajustado = clampMedida(clave, valor);
+                            if (ajustado !== valor) huboAjustes = true;
+                            medidas[clave] = ajustado;
                         }
                     }
                 });
+                // Reflejar todos los valores finales (alguno puede haber
+                // cambiado por la relación entrepierna/estatura).
+                for (const clave of Object.keys(medidas)) {
+                    document.getElementById(`input-${clave}`).value = medidas[clave];
+                }
+                avisoEl().textContent = huboAjustes
+                    ? "Algunos valores del archivo se ajustaron para que la figura no se deforme."
+                    : "";
                 generarSVG();
-                input.value = ''; 
+                input.value = '';
             };
             lector.readAsText(archivo);
         }
