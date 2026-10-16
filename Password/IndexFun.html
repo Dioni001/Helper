@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Seguridad Local</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #38bdf8;
+            --text: #f1f5f9;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 1rem 0 0.5rem 0;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .strength-container { margin-bottom: 1.5rem; }
+        .strength-meter {
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        #strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        button:active { transform: scale(0.98); }
+        .btn-brute { background-color: var(--primary); color: #0f172a; }
+        .btn-dict { background-color: #64748b; color: white; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        #stats {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #020617;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-line;
+            border-left: 3px solid var(--primary);
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="margin:0; color: var(--primary)">Security Tester</h2>
+    <p style="font-size: 0.9rem; color: #94a3b8;">Simulación de vulnerabilidad</p>
+    
+    <input type="password" id="password" placeholder="Ingresa contraseña..." oninput="updateStrength()">
+    
+    <div class="strength-container">
+        <div style="font-size: 0.75rem; display: flex; justify-content: space-between;">
+            <span>Fortaleza:</span>
+            <span id="strength-text">Vacía</span>
+        </div>
+        <div class="strength-meter">
+            <div id="strength-bar"></div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="btn-brute" id="btnB" onclick="startBruteForce()">Fuerza Bruta</button>
+        <button class="btn-dict" id="btnD" onclick="startDictionary()">Diccionario</button>
+    </div>
+
+    <div id="stats">Cargando sistema...</div>
+</div>
+
+<script>
+const stats = document.getElementById("stats");
+const strengthBar = document.getElementById("strength-bar");
+const strengthText = document.getElementById("strength-text");
+let currentInterval = null;
+let externalDictionary = [];
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789.,:;!?¡¿'()[]{}-_/\|@#$%&*+=<>^`~";
+
+// CARGA DEL ARCHIVO TXT LOCAL
+async function loadLocalDictionary() {
+    try {
+        // Apuntamos al archivo local que mencionaste
+        const response = await fetch('10k-most-common.txt');
+        if (!response.ok) throw new Error();
+        const text = await response.text();
+        externalDictionary = text.split(/\r?\n/).map(word => word.trim()).filter(word => word.length > 0);
+        stats.textContent = `Diccionario cargado: ${externalDictionary.length} palabras.`;
+    } catch (e) {
+        stats.textContent = "Error: No se pudo leer '10k-most-common.txt'.\nAsegúrate de que el archivo esté en la misma carpeta y usa un servidor local.";
+    }
+}
+loadLocalDictionary();
+
+// MEDIDOR DE CALIDAD
+function updateStrength() {
+    const pass = document.getElementById("password").value;
+    let score = 0;
+    if (!pass) {
+        strengthBar.style.width = "0%";
+        strengthText.textContent = "Vacía";
+        return;
+    }
+
+    // Lógica de puntos básica
+    score += pass.length * 4;
+    if (/[A-Z]/.test(pass)) score += 15;
+    if (/[0-9]/.test(pass)) score += 15;
+    if (/[^A-Za-z0-9]/.test(pass)) score += 20;
+    
+    score = Math.min(score, 100);
+    strengthBar.style.width = score + "%";
+
+    if (score < 30) {
+        strengthBar.style.backgroundColor = "var(--danger)";
+        strengthText.textContent = "Muy Débil";
+    } else if (score < 70) {
+        strengthBar.style.backgroundColor = "var(--warning)";
+        strengthText.textContent = "Moderada";
+    } else {
+        strengthBar.style.backgroundColor = "var(--success)";
+        strengthText.textContent = "Fuerte";
+    }
+}
+
+function toggleButtons(state) {
+    document.getElementById("btnB").disabled = state;
+    document.getElementById("btnD").disabled = state;
+}
+
+// ATAQUE DICCIONARIO
+function startDictionary() {
+    const target = document.getElementById("password").value;
+    if (!target || externalDictionary.length === 0) return;
+
+    clearInterval(currentInterval);
+    toggleButtons(true);
+    let i = 0;
+    const start = performance.now();
+
+    currentInterval = setInterval(() => {
+        for (let j = 0; j < 100; j++) {
+            if (i >= externalDictionary.length) {
+                stats.textContent = "Fin: No encontrada en el archivo.";
+                clearInterval(currentInterval);
+                toggleButtons(false);
+                return;
+            }
+            if (externalDictionary[i] === target) {
+                const t = (performance.now() - start) / 1000;
+                stats.textContent = `¡EXITO!\nEncontrada en diccionario.\nValor: ${externalDictionary[i]}\nPosición: ${i+1}\nTiempo: ${t.toFixed(3)}s`;
+                clearInterval(currentInterval);
+                toggleButtons(false);
+                return;
+            }
+            i++;
+        }
+        stats.textContent = `Buscando en TXT...\nIntentos: ${i}\nProbando: ${externalDictionary[i]}`;
+    }, 10);
+}
+
+// FUERZA BRUTA OPTIMIZADA (Sin uso excesivo de RAM)
+function getCombination(n, set) {
+    let result = "";
+    let base = set.length;
+    while (n >= 0) {
+        result = set[n % base] + result;
+        n = Math.floor(n / base) - 1;
+    }
+    return result;
+}
+
+function startBruteForce() {
+    const target = document.getElementById("password").value;
+    if (!target) return;
+
+    clearInterval(currentInterval);
+    toggleButtons(true);
+    let count = 0;
+    const start = performance.now();
+
+    currentInterval = setInterval(() => {
+        for (let j = 0; j < 1000000; j++) { // velocidad estandar 100000
+            const candidate = getCombination(count, charset);
+            if (candidate === target) {
+                const t = (performance.now() - start) / 1000;
+                stats.textContent = `¡CRACKED!\nValor: ${candidate}\nIntentos: ${count}\nTiempo: ${t.toFixed(3)}s`;
+                clearInterval(currentInterval);
+                toggleButtons(false);
+                return;
+            }
+            count++;
+        }
+        const elapsed = (performance.now() - start) / 1000;
+        stats.textContent = `Fuerza Bruta activa...\nIntentos: ${count}\nVelocidad: ${(count/elapsed).toFixed(0)} i/s`;
+    }, 1);
+}
+</script>
+
+</body>
+</html>

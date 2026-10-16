@@ -1,0 +1,9 @@
+estatura=175
+cuello=42
+hombros=55
+pecho=105
+biceps=35
+cintura=90
+cadera=100
+muslo=60
+entrepierna=85

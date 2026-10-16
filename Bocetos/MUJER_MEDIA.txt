@@ -1,0 +1,9 @@
+estatura=163
+cuello=35
+hombros=44
+pecho=95
+biceps=30
+cintura=75
+cadera=105
+muslo=60
+entrepierna=75

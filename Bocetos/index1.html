@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador Geométrico Humano v3</title>
+    <style>
+        body { 
+            background: #121212; color: #e0e0e0; font-family: monospace; 
+            display: flex; flex-direction: column; align-items: center; padding: 20px; 
+        }
+        .container {
+            display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+            margin-top: 20px;
+        }
+        .panel-controles {
+            background: #1e1e1e; padding: 20px; border: 1px solid #444;
+            border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; gap: 10px; min-width: 250px;
+        }
+        .control-group {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .control-group label { font-size: 14px; }
+        .control-group input {
+            width: 70px; background: #333; color: white; border: 1px solid #555; 
+            padding: 5px; border-radius: 4px; text-align: right;
+        }
+        svg { 
+            background: #1e1e1e; border: 1px solid #444; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-radius: 8px;
+        }
+        .botones { display: flex; gap: 10px; margin-top: 15px; }
+        button, .btn-upload {
+            padding: 8px 16px; cursor: pointer; border: none; border-radius: 3px;
+            font-family: monospace; font-size: 14px; text-align: center;
+        }
+        .btn-save { background: #4CAF50; color: white; }
+        .btn-upload { background: #333; color: white; border: 1px solid #777; }
+    </style>
+</head>
+<body>
+
+    <h2>Maniquí Geométrico Estructural</h2>
+
+    <div class="container">
+        <div class="panel-controles">
+            <h3 style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px;">Medidas (cm)</h3>
+            <div id="inputs-zone"></div>
+            
+            <div class="botones">
+                <button class="btn-save" onclick="guardarModelo()">Guardar (.txt)</button>
+                <label class="btn-upload">
+                    Cargar (.txt)
+                    <input type="file" accept=".txt" style="display: none;" onchange="cargarModelo(event)">
+                </label>
+            </div>
+        </div>
+
+        <div id="render-zone"></div>
+    </div>
+
+    <script>
+        // Objeto central de medidas
+        const medidas = {
+            estatura: 175,
+            cuello: 42,
+            hombros: 55,
+            pecho: 105,
+            biceps: 35,
+            cintura: 90,
+            cadera: 100,
+            muslo: 60,
+            entrepierna: 85
+        };
+
+        const getDiametro = (perimetro) => perimetro / Math.PI;
+
+        // 1. GENERADOR DEL SVG
+        function generarSVG() {
+            const m = medidas;
+            const lienzoW = 120; // Devuelto al ancho original para evitar distorsiones
+            const cx = lienzoW / 2; 
+            
+            const yTope = 15; 
+            const ySuelo = yTope + m.estatura; 
+            const lienzoH = ySuelo + 15; 
+            
+            const radioCabezaY = 12;
+            const yCabeza = yTope + radioCabezaY; 
+            const yCadera = ySuelo - m.entrepierna; 
+            
+            const longitudTorso = yCadera - yCabeza;
+            const yHombros = yCabeza + (longitudTorso * 0.20);
+            const yPecho = yCabeza + (longitudTorso * 0.45);
+            const yCintura = yCabeza + (longitudTorso * 0.75);
+
+            const rPecho = getDiametro(m.pecho) / 2;
+            const rCintura = getDiametro(m.cintura) / 2;
+            const rCadera = getDiametro(m.cadera) / 2;
+            const rMuslo = getDiametro(m.muslo) / 2;
+            const rBiceps = getDiametro(m.biceps) / 2;
+            const hombrosMitad = m.hombros / 2;
+
+            let svgString = `<svg viewBox="0 0 ${lienzoW} ${lienzoH}" width="400" height="600" xmlns="http://www.w3.org/2000/svg">`;
+
+            // Eje central
+            svgString += `<line x1="${cx}" y1="${yTope}" x2="${cx}" y2="${ySuelo}" stroke="#333" stroke-width="0.5" stroke-dasharray="2,2" />`;
+
+            // TORSO
+            const torsoPoints = `
+                ${cx - hombrosMitad},${yHombros} 
+                ${cx - rPecho},${yPecho} 
+                ${cx - rCintura},${yCintura} 
+                ${cx - rCadera},${yCadera} 
+                ${cx + rCadera},${yCadera} 
+                ${cx + rCintura},${yCintura} 
+                ${cx + rPecho},${yPecho} 
+                ${cx + hombrosMitad},${yHombros}
+            `;
+            svgString += `<polygon points="${torsoPoints}" fill="rgba(76, 175, 80, 0.1)" stroke="#4CAF50" stroke-width="1.5" stroke-linejoin="round" />`;
+
+            // PIERNAS
+            svgString += `<polygon points="${cx - rCadera},${yCadera} ${cx},${yCadera} ${cx - rMuslo/2},${ySuelo} ${cx - rMuslo*1.5},${ySuelo}" fill="none" stroke="#2196F3" stroke-width="1.5" />`;
+            svgString += `<polygon points="${cx},${yCadera} ${cx + rCadera},${yCadera} ${cx + rMuslo*1.5},${ySuelo} ${cx + rMuslo/2},${ySuelo}" fill="none" stroke="#2196F3" stroke-width="1.5" />`;
+
+            // BRAZOS (Ajustados para colgar rectos desde los hombros, sin ensanchar en exceso)
+            const longitudBrazo = longitudTorso * 1.1; 
+            const yMano = yHombros + longitudBrazo;
+            
+            // Brazo Izquierdo
+            svgString += `<polygon points="${cx - hombrosMitad},${yHombros} ${cx - hombrosMitad - (rBiceps*1.5)},${yHombros} ${cx - rCadera - 10 - rBiceps},${yMano} ${cx - rCadera - 10},${yMano}" fill="none" stroke="#FF9800" stroke-width="1.5" />`;
+            // Brazo Derecho
+            svgString += `<polygon points="${cx + hombrosMitad},${yHombros} ${cx + hombrosMitad + (rBiceps*1.5)},${yHombros} ${cx + rCadera + 10 + rBiceps},${yMano} ${cx + rCadera + 10},${yMano}" fill="none" stroke="#FF9800" stroke-width="1.5" />`;
+
+            // CABEZA Y CUELLO
+            const rCuello = getDiametro(m.cuello) / 2;
+            const alturaCuello = yHombros - (yCabeza + 5); 
+            
+            svgString += `<rect x="${cx - rCuello}" y="${yCabeza + 5}" width="${rCuello * 2}" height="${alturaCuello > 0 ? alturaCuello : 10}" fill="none" stroke="#9C27B0" stroke-width="1.5" />`;
+            svgString += `<ellipse cx="${cx}" cy="${yCabeza}" rx="8" ry="${radioCabezaY}" fill="none" stroke="#9C27B0" stroke-width="1.5" />`;
+
+            // PISO
+            svgString += `<line x1="10" y1="${ySuelo}" x2="${lienzoW - 10}" y2="${ySuelo}" stroke="#fff" stroke-width="1" />`;
+
+            svgString += `</svg>`;
+            
+            document.getElementById("render-zone").innerHTML = svgString;
+        }
+
+        // 2. SISTEMA DE INPUTS DINÁMICOS
+        function crearInputs() {
+            const contenedor = document.getElementById("inputs-zone");
+            contenedor.innerHTML = ""; // Limpiar
+            
+            for (const [clave, valor] of Object.entries(medidas)) {
+                // Capitalizar primera letra para la etiqueta
+                const nombreLabel = clave.charAt(0).toUpperCase() + clave.slice(1);
+                
+                const div = document.createElement("div");
+                div.className = "control-group";
+                div.innerHTML = `
+                    <label>${nombreLabel}</label>
+                    <input type="number" id="input-${clave}" value="${valor}" step="0.5" oninput="actualizarMedida('${clave}', this.value)">
+                `;
+                contenedor.appendChild(div);
+            }
+        }
+
+        function actualizarMedida(clave, valor) {
+            const num = parseFloat(valor);
+            if (!isNaN(num)) {
+                medidas[clave] = num;
+                generarSVG(); // Re-dibujar en tiempo real
+            }
+        }
+
+        // 3. GUARDAR Y CARGAR .TXT
+        function guardarModelo() {
+            let contenido = "";
+            for (const [clave, valor] of Object.entries(medidas)) {
+                contenido += `${clave}=${valor}\n`;
+            }
+            const blob = new Blob([contenido], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "modelo_medidas.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function cargarModelo(event) {
+            const input = event.target;
+            const archivo = input.files[0];
+            if (!archivo) return;
+
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                const lineas = e.target.result.split('\n');
+                lineas.forEach(linea => {
+                    if (linea.trim() === "") return;
+                    const partes = linea.split('=');
+                    if (partes.length === 2) {
+                        const clave = partes[0].trim();
+                        const valor = parseFloat(partes[1].trim());
+                        if (medidas.hasOwnProperty(clave) && !isNaN(valor)) {
+                            medidas[clave] = valor;
+                            // Actualizar también el valor visual en la cajita del input
+                            document.getElementById(`input-${clave}`).value = valor;
+                        }
+                    }
+                });
+                generarSVG();
+                input.value = ''; 
+            };
+            lector.readAsText(archivo);
+        }
+
+        // INICIALIZAR LA APLICACIÓN
+        crearInputs();
+        generarSVG();
+    </script>
+</body>
+</html>
